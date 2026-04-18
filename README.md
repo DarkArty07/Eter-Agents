@@ -1,4 +1,4 @@
-# Eter Agent Ecosystem
+# Eter Agents
 
 Multi-agent AI infrastructure built on the [Hermes Agent](https://github.com/nousresearch/hermes-agent) framework.
 
@@ -34,7 +34,7 @@ hermes --version
 
 ```bash
 # 1. Clone the ecosystem into ~/.hermes/
-git clone https://github.com/DarkArty07/Eter-Agent-Ecosystem.git ~/.hermes
+git clone https://github.com/DarkArty07/Eter-Agents.git ~/.hermes
 cd ~/.hermes
 
 # 2. Install the Hermes Agent SDK (see above)

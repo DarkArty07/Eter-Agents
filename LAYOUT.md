@@ -1,4 +1,4 @@
-# Eter Agent Ecosystem — Directory Layout
+# Eter Agents — Directory Layout
 
 > Canonical reference for `~/.hermes/` structure.
 > Last updated: 2026-04-18
