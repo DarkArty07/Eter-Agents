@@ -3,8 +3,7 @@ Smoke test para el plugin agora.
 No requiere tmux, harmonia ni agentes corriendo.
 
 Ejecutar:
-    $HOME/.hermes/sdk/venv/bin/python \
-    $HOME/.hermes/agora/plugin/tests/test_smoke.py
+    python agora/plugin/tests/test_smoke.py
 """
 
 import json
@@ -14,20 +13,23 @@ import subprocess
 import sys
 import importlib
 import types
+from pathlib import Path
 
-# ── Importar el plugin ──────────────────────────────────────────────────────
+# ── Path setup (portable) ──────────────────────────────────────────────────
 
-sys.path.insert(0, '$HOME/.hermes/sdk')
+REPO_ROOT = Path(__file__).resolve().parents[3]   # ~/.hermes/ or project root
+AGORA_DIR = REPO_ROOT / "agora"
 
-# Restaurar HOME al valor real para que ~ se expanda correctamente
-# (el entorno hermes puede sobreescribir HOME al del profile)
-os.environ['HOME'] = '$HOME'
-os.environ['HERMES_HOME'] = '$HOME/.hermes/profiles/hermes'
+sys.path.insert(0, str(REPO_ROOT))
+
+# HERMES_HOME apunta al profile hermes dentro del repo
+os.environ.setdefault('HOME', str(Path.home()))
+os.environ['HERMES_HOME'] = str(REPO_ROOT / "profiles" / "hermes")
 
 # Crear paquete padre 'agora' en sys.modules para que los imports relativos
 # en plugin/__init__.py (from . import _orchestrator) funcionen.
 agora_pkg = types.ModuleType('agora')
-agora_pkg.__path__ = ['$HOME/.hermes/agora']
+agora_pkg.__path__ = [str(AGORA_DIR)]
 agora_pkg.__package__ = 'agora'
 sys.modules['agora'] = agora_pkg
 
@@ -36,8 +38,8 @@ import importlib.util
 
 spec = importlib.util.spec_from_file_location(
     'agora.plugin',
-    '$HOME/.hermes/agora/plugin/__init__.py',
-    submodule_search_locations=['$HOME/.hermes/agora/plugin'],
+    str(AGORA_DIR / "plugin" / "__init__.py"),
+    submodule_search_locations=[str(AGORA_DIR / "plugin")],
 )
 agora = importlib.util.module_from_spec(spec)
 agora.__package__ = 'agora.plugin'
@@ -99,7 +101,7 @@ def _tmux_installed() -> bool:
 
 # 1. Detección de rol: orchestrator
 def t_rol_orchestrator():
-    os.environ['HERMES_HOME'] = '$HOME/.hermes/profiles/hermes'
+    os.environ['HERMES_HOME'] = str(REPO_ROOT / "profiles" / "hermes")
     ctx = MockCtx()
     agora.register(ctx)
     assert 'talk_to' in ctx.registered_tools, \
@@ -110,7 +112,7 @@ test("detección de rol: orchestrator", t_rol_orchestrator)
 
 # 2. Detección de rol: worker
 def t_rol_worker():
-    os.environ['HERMES_HOME'] = '$HOME/.hermes/profiles/ariadna'
+    os.environ['HERMES_HOME'] = str(REPO_ROOT / "profiles" / "ariadna")
     ctx = MockCtx()
     agora.register(ctx)
     assert 'post_llm_call' in ctx.registered_hooks, \
@@ -119,7 +121,7 @@ def t_rol_worker():
 test("detección de rol: worker", t_rol_worker)
 
 # Restaurar HERMES_HOME para el resto de los tests
-os.environ['HERMES_HOME'] = '$HOME/.hermes/profiles/hermes'
+os.environ['HERMES_HOME'] = str(REPO_ROOT / "profiles" / "hermes")
 
 
 # 3. discover ? → JSON válido, Ariadna incluida, count >= 1
@@ -193,7 +195,7 @@ test("open → manejo de tmux", t_open_sin_tmux)
 def t_message_sin_open():
     # Limpiar pane_map para asegurar estado limpio
     orchestrator._pane_map.clear()
-    raw = orchestrator._action_message("ariadna", "hola")
+    raw = orchestrator._action_message("ariadna", "hola", "")
     data = json.loads(raw)
     assert "error" in data, f"se esperaba campo 'error', obtenido: {data}"
     # El código revisa primero si existe la card (AgentNotFound) y luego
@@ -205,15 +207,15 @@ def t_message_sin_open():
 test("message sin open → CanalNoAbierto", t_message_sin_open)
 
 
-# 8. close sin pipe → status closed, sin error
-def t_close_sin_pipe():
-    raw = orchestrator._action_close("ariadna")
+# 8. close sin sesión → SessionNotFound
+def t_close_sin_sesion():
+    raw = orchestrator._action_close("invalid_session", "ariadna")
     data = json.loads(raw)
-    assert data.get("status") == "closed", \
-        f"status esperado 'closed', obtenido: {data}"
-    assert "error" not in data, f"no se esperaba error: {data}"
+    # Sesión inexistente → SessionNotFound
+    assert data.get("error") == "SessionNotFound", \
+        f"error esperado 'SessionNotFound', obtenido: {data}"
 
-test("close sin pipe → status closed", t_close_sin_pipe)
+test("close sin sesión → SessionNotFound", t_close_sin_sesion)
 
 
 # 9. hook worker sin pipe → return silencioso, no cuelga
