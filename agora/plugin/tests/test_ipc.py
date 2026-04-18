@@ -18,16 +18,21 @@ from pathlib import Path
 
 # ── Importar el plugin ──────────────────────────────────────────────────────
 
-sys.path.insert(0, '$HOME/.hermes/sdk')
+from pathlib import Path
+REPO_ROOT = Path(__file__).resolve().parents[3]
+AGORA_DIR = REPO_ROOT / "agora"
+
+sys.path.insert(0, str(REPO_ROOT))
 
 # Restaurar HOME al valor real para que ~ se expanda correctamente
-os.environ['HOME'] = '$HOME'
-os.environ['HERMES_HOME'] = '$HOME/.hermes/profiles/hermes'
+if 'HOME' not in os.environ:
+    os.environ['HOME'] = str(Path.home())
+os.environ['HERMES_HOME'] = str(REPO_ROOT / "profiles/hermes")
 
 # --- Cargar _orchestrator.py directamente ---
 spec_orch = importlib.util.spec_from_file_location(
     'agora.plugin._orchestrator',
-    '$HOME/.hermes/agora/plugin/_orchestrator.py'
+    str(AGORA_DIR / "plugin/_orchestrator.py")
 )
 orchestrator = importlib.util.module_from_spec(spec_orch)
 sys.modules['agora.plugin._orchestrator'] = orchestrator
@@ -104,88 +109,74 @@ def test_full_pipe_cycle():
 test("Test 1 — ciclo completo FIFO: mensaje recibido correctamente", test_full_pipe_cycle)
 
 
-# ── Test 2 — Timeout del thread reader ──────────────────────────────────────
+# ── Test 2 — Timeout del registry.wait ──────────────────────────────────────
 
 def test_timeout():
     """
-    Crea un pipe para "ariadna", parchea _TIMEOUT_SECONDS a 2s,
-    llama _action_message — nadie escribe → debe retornar Timeout en ~2s.
-
-    Nota: tmux send-keys falla silenciosamente.
-    El thread reader bloquea indefinidamente en open(pipe, "r") hasta que
-    el timeout lo interrumpe eliminando el pipe.
+    Crea una sesión, llama _action_wait con timeout=1s.
+    Nadie escribe en el inbox → debe retornar status: timeout en ~1s.
     """
-    original_timeout = orchestrator._TIMEOUT_SECONDS
-    orchestrator._TIMEOUT_SECONDS = 2
-
     # El código usa .pane_map para encontrar el target tmux.
     # Simulamos que _action_open registró un pane para ariadna.
     original_pane_map = dict(orchestrator._pane_map)
     orchestrator._pane_map["ariadna"] = "agora:ariadna"
 
-    # El código usa .pipe como extensión de pipe
-    pipe_path = orchestrator.IPC_DIR / "ariadna.pipe"
-    orchestrator.IPC_DIR.mkdir(parents=True, exist_ok=True)
+    # Mock open a session to get a session_id
+    # We need a card for ariadna to exist, which it does in /app/agora/plugin/cards/ariadna.yaml
+    # We also need to mock _check_tmux_available and _ensure_agent_running to return True
+    import unittest.mock as mock
+    with mock.patch.object(orchestrator, "_check_tmux_available", return_value=True), \
+         mock.patch.object(orchestrator, "_ensure_agent_running", return_value=True):
+        open_res = json.loads(orchestrator._action_open("ariadna"))
+        session_id = open_res.get("session_id")
 
-    # Cleanup previo
-    if pipe_path.exists():
-        os.remove(pipe_path)
-
-    os.mkfifo(pipe_path)
+    assert session_id is not None, f"No se pudo abrir sesión: {open_res}"
 
     t_start = time.time()
-    result = json.loads(orchestrator._action_message("ariadna", "ping"))
+    result = json.loads(orchestrator._action_wait(session_id, "ariadna", 1))
     elapsed = time.time() - t_start
 
-    # Restaurar antes de los asserts para cleanup seguro
-    orchestrator._TIMEOUT_SECONDS = original_timeout
+    # Restaurar
     orchestrator._pane_map = original_pane_map
 
-    # Cleanup (el timeout ya elimina el pipe, pero por si acaso)
-    if pipe_path.exists():
-        os.remove(pipe_path)
-
-    assert result.get("error") == "Timeout", (
-        f"Esperado Timeout, obtenido: {result}"
+    assert result.get("status") == "timeout", (
+        f"Esperado status 'timeout', obtenido: {result}"
     )
-    assert elapsed < 10, f"Tardó demasiado: {elapsed:.1f}s (esperado ~2s)"
-    results[-1] = f"✅ Test 2 — timeout: retorna error en ~{elapsed:.1f}s"
+    assert 0.8 <= elapsed <= 5.0, f"Tiempo fuera de rango: {elapsed:.1f}s (esperado ~1s)"
+    results[-1] = f"✅ Test 2 — timeout: retorna status timeout en ~{elapsed:.1f}s"
 
 
-test("Test 2 — timeout: retorna error en ~2s", test_timeout)
+test("Test 2 — timeout: retorna status timeout en ~1s", test_timeout)
 
 
-# ── Test 3 — close limpia el pipe ───────────────────────────────────────────
+# ── Test 3 — close limpia la sesión ───────────────────────────────────────────
 
-def test_close_removes_pipe():
+def test_close_removes_session():
     """
-    Crea un FIFO para "ariadna", llama _action_close,
-    verifica que el pipe fue eliminado y el resultado tiene status: closed.
+    Crea una sesión, llama _action_close,
+    verifica que la sesión fue eliminada del registry.
     """
-    # El código usa .pipe como extensión de pipe
-    pipe_path = orchestrator.IPC_DIR / "ariadna.pipe"
-    orchestrator.IPC_DIR.mkdir(parents=True, exist_ok=True)
+    import unittest.mock as mock
+    with mock.patch.object(orchestrator, "_check_tmux_available", return_value=True), \
+         mock.patch.object(orchestrator, "_ensure_agent_running", return_value=True):
+        open_res = json.loads(orchestrator._action_open("ariadna"))
+        session_id = open_res.get("session_id")
 
-    # Cleanup previo
-    if pipe_path.exists():
-        os.remove(pipe_path)
+    assert session_id is not None, f"No se pudo abrir sesión: {open_res}"
+    assert orchestrator.agora_registry.get(session_id) is not None
 
-    os.mkfifo(pipe_path)
+    result = json.loads(orchestrator._action_close(session_id, "ariadna"))
 
-    assert pipe_path.exists(), "El pipe debería existir antes del close"
-
-    result = json.loads(orchestrator._action_close("ariadna"))
-
-    assert not pipe_path.exists(), (
-        f"El pipe debería haber sido eliminado, pero aún existe: {pipe_path}"
+    assert orchestrator.agora_registry.get(session_id) is None, (
+        f"La sesión debería haber sido eliminada del registry"
     )
     assert result.get("status") == "closed", (
         f"Esperado status 'closed', obtenido: {result}"
     )
-    results[-1] = "✅ Test 3 — close: pipe eliminado"
+    results[-1] = "✅ Test 3 — close: sesión eliminada"
 
 
-test("Test 3 — close: pipe eliminado", test_close_removes_pipe)
+test("Test 3 — close: sesión eliminada", test_close_removes_session)
 
 
 # ── Reporte ─────────────────────────────────────────────────────────────────
