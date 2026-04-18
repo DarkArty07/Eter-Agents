@@ -13,6 +13,7 @@ Registra la tool talk_to con siete acciones:
 Arquitectura async: message no bloquea. Polling del inbox JSON para respuestas.
 """
 
+import functools
 import json
 import logging
 import subprocess
@@ -156,6 +157,7 @@ def _handle_talk_to(args: dict, **kwargs) -> str:
 # ---------------------------------------------------------------------------
 
 
+@functools.lru_cache(maxsize=32)
 def _load_card(agent_name: str) -> dict | None:
     card_path = CARDS_DIR / f"{agent_name}.yaml"
     if not card_path.exists():
