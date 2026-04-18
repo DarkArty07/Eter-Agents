@@ -12,8 +12,10 @@ sys.path.insert(0, str(REPO_ROOT))
 # Mock basic setup before importing orchestrator if necessary
 os.environ['HERMES_HOME'] = str(REPO_ROOT / "profiles/hermes")
 
-# We need to mock 'yaml' if it's not installed, but it is available via PYTHONPATH in our runner
-# or we can just let it try to import.
+# Ensure PYTHONPATH is set for PyYAML if needed
+if "/home/jules/.local/share/pipx/venvs/conan/lib/python3.12/site-packages" not in sys.path:
+    sys.path.append("/home/jules/.local/share/pipx/venvs/conan/lib/python3.12/site-packages")
+
 try:
     from agora.plugin import _orchestrator
 except ImportError:

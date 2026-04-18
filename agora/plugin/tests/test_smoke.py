@@ -17,22 +17,17 @@ import types
 
 # ── Importar el plugin ──────────────────────────────────────────────────────
 
-from pathlib import Path
-REPO_ROOT = Path(__file__).resolve().parents[3]
-AGORA_DIR = REPO_ROOT / "agora"
-
-sys.path.insert(0, str(REPO_ROOT))
+sys.path.insert(0, '$HOME/.hermes/sdk')
 
 # Restaurar HOME al valor real para que ~ se expanda correctamente
 # (el entorno hermes puede sobreescribir HOME al del profile)
-if 'HOME' not in os.environ:
-    os.environ['HOME'] = str(Path.home())
-os.environ['HERMES_HOME'] = str(REPO_ROOT / "profiles/hermes")
+os.environ['HOME'] = '$HOME'
+os.environ['HERMES_HOME'] = '$HOME/.hermes/profiles/hermes'
 
 # Crear paquete padre 'agora' en sys.modules para que los imports relativos
 # en plugin/__init__.py (from . import _orchestrator) funcionen.
 agora_pkg = types.ModuleType('agora')
-agora_pkg.__path__ = [str(AGORA_DIR)]
+agora_pkg.__path__ = ['$HOME/.hermes/agora']
 agora_pkg.__package__ = 'agora'
 sys.modules['agora'] = agora_pkg
 
@@ -41,8 +36,8 @@ import importlib.util
 
 spec = importlib.util.spec_from_file_location(
     'agora.plugin',
-    str(AGORA_DIR / "plugin/__init__.py"),
-    submodule_search_locations=[str(AGORA_DIR / "plugin")],
+    '$HOME/.hermes/agora/plugin/__init__.py',
+    submodule_search_locations=['$HOME/.hermes/agora/plugin'],
 )
 agora = importlib.util.module_from_spec(spec)
 agora.__package__ = 'agora.plugin'
@@ -198,7 +193,7 @@ test("open → manejo de tmux", t_open_sin_tmux)
 def t_message_sin_open():
     # Limpiar pane_map para asegurar estado limpio
     orchestrator._pane_map.clear()
-    raw = orchestrator._action_message("ariadna", "hola", "")
+    raw = orchestrator._action_message("ariadna", "hola")
     data = json.loads(raw)
     assert "error" in data, f"se esperaba campo 'error', obtenido: {data}"
     # El código revisa primero si existe la card (AgentNotFound) y luego
@@ -210,15 +205,15 @@ def t_message_sin_open():
 test("message sin open → CanalNoAbierto", t_message_sin_open)
 
 
-# 8. close sin pipe → SessionNotFound
+# 8. close sin pipe → status closed, sin error
 def t_close_sin_pipe():
-    raw = orchestrator._action_close("agora_invalid", "ariadna")
+    raw = orchestrator._action_close("ariadna")
     data = json.loads(raw)
-    # result = {"error": "SessionNotFound", "session_id": "agora_invalid"}
-    assert data.get("error") == "SessionNotFound", \
-        f"error esperado 'SessionNotFound', obtenido: {data}"
+    assert data.get("status") == "closed", \
+        f"status esperado 'closed', obtenido: {data}"
+    assert "error" not in data, f"no se esperaba error: {data}"
 
-test("close sin pipe → SessionNotFound", t_close_sin_pipe)
+test("close sin pipe → status closed", t_close_sin_pipe)
 
 
 # 9. hook worker sin pipe → return silencioso, no cuelga
