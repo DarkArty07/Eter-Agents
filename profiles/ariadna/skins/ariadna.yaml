@@ -1,0 +1,79 @@
+name: ariadna
+description: "La Tejedora del Laberinto — Project Manager & QA Auditor"
+
+# ── Colors ──────────────────────────────────────────────────────────────────
+# Paleta: rosa (#FF69B4) · lila (#C8A2C8) · morado (#8B5CF6) · fondo (#1a1025)
+colors:
+  # Banner panel
+  banner_border: "#C8A2C8"        # Lila — borde del panel principal
+  banner_title: "#FF69B4"         # Rosa — título del banner
+  banner_accent: "#8B5CF6"        # Morado — headers de secciones
+  banner_dim: "#3D1F5E"           # Morado muy oscuro — separadores y texto dim
+  banner_text: "#F0D6E8"          # Rosa pálido suave — cuerpo de texto
+
+  # UI elements
+  ui_accent: "#8B5CF6"            # Morado — acento general de UI
+  ui_label: "#C8A2C8"             # Lila — labels y etiquetas
+  ui_ok: "#A78BFA"                # Violeta suave — success (no verde, queda en paleta)
+  ui_error: "#F472B6"             # Rosa intenso — error (visible pero en paleta)
+  ui_warn: "#C084FC"              # Morado claro — warning
+
+  # Input area
+  prompt: "#F0D6E8"               # Rosa pálido — texto del prompt
+  input_rule: "#3D1F5E"           # Morado oscuro — línea separadora del input
+
+  # Response box
+  response_border: "#FF69B4"      # Rosa — borde de la caja de respuesta
+
+  # Session display
+  session_label: "#C8A2C8"        # Lila — etiqueta de sesión
+  session_border: "#3D1F5E"       # Morado oscuro — ID de sesión dim
+
+# ── Spinner ─────────────────────────────────────────────────────────────────
+spinner:
+  waiting_faces:
+    - "(◈)"
+    - "(∿)"
+    - "(⊕)"
+    - "(◎)"
+    - "(⌘)"
+    - "(◐)"
+    - "(◑)"
+
+  thinking_faces:
+    - "(◈)"
+    - "(∿)"
+    - "(⊕)"
+    - "(◎)"
+    - "(⌁)"
+    - "(◐)"
+
+  thinking_verbs:
+    - "tejiendo"
+    - "analizando"
+    - "registrando"
+    - "auditando"
+    - "trazando"
+    - "verificando"
+    - "cartografiando"
+    - "revisando"
+    - "organizando"
+    - "consultando"
+
+  wings:
+    - ["◈ ", " ◈"]
+    - ["∿ ", " ∿"]
+    - ["⟦ ", " ⟧"]
+    - ["· ", " ·"]
+
+# ── Branding ────────────────────────────────────────────────────────────────
+branding:
+  agent_name: "Ariadna"
+  welcome: "El hilo está listo. ¿En qué proyecto comenzamos? ◈"
+  goodbye: "Sesión registrada. El laberinto queda ordenado. ◈"
+  response_label: " ◈ Ariadna "
+  prompt_symbol: "◈ ❯ "
+  help_header: "◈ Comandos disponibles"
+
+# ── Tool Output ─────────────────────────────────────────────────────────────
+tool_prefix: "╎"

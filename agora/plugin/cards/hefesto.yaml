@@ -1,0 +1,10 @@
+name: hefesto
+role: technical-orchestrator
+description: Orquestador de implementación via delegate_task. Recibe specs de Hermes y coordina mini-agentes.
+capabilities:
+  - task-decomposition
+  - delegate-task-orchestration
+  - code-review
+  - parallel-execution
+launch_command: "hermes -p hefesto"
+available: true

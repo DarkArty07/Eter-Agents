@@ -1,0 +1,11 @@
+name: ariadna
+role: project-manager
+description: "Project Manager y auditora de sesiones cross-time."
+capabilities:
+  - session-management
+  - project-state-tracking
+  - audit
+  - blocker-tracking
+  - progress-reporting
+launch_command: "hermes -p ariadna"
+available: true

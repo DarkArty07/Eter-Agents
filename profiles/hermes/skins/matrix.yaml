@@ -1,0 +1,88 @@
+name: matrix
+description: "Enter the Matrix — digital rain aesthetic, green on black"
+
+# ── Colors ──────────────────────────────────────────────────────────────────
+colors:
+  # Banner panel
+  banner_border: "#00FF41"        # Matrix green brillante
+  banner_title: "#00FF41"         # Verde puro
+  banner_accent: "#39FF14"        # Verde neón secciones
+  banner_dim: "#003B00"           # Verde muy oscuro, casi negro
+  banner_text: "#00D400"          # Verde medio cuerpo de texto
+
+  # UI elements
+  ui_accent: "#00FF41"            # Acento general
+  ui_label: "#39FF14"             # Labels
+  ui_ok: "#00FF41"                # Success
+  ui_error: "#FF0000"             # Error — rojo, el único color no verde
+  ui_warn: "#FFFF00"              # Warning — amarillo
+
+  # Input area
+  prompt: "#00FF41"               # Prompt verde brillante
+  input_rule: "#003B00"           # Línea separadora oscura
+
+  # Response box
+  response_border: "#00FF41"      # Borde de respuesta verde
+
+  # Session display
+  session_label: "#39FF14"        # Session label
+  session_border: "#003B00"       # Session ID dim
+
+# ── Spinner ─────────────────────────────────────────────────────────────────
+spinner:
+  waiting_faces:
+    - "01001000 01000101 01010010"
+    - "[::] LOADING THE MATRIX"
+    - "[▓▓▓░░] COMPILING"
+    - "[▓▓░░░] DECRYPTING"
+    - "[▓░░░░] JACKING IN"
+    - "10110100 11001010"
+    - "░░▓▓▓░░ BUFFERING"
+    - "< MATRIX >"
+    - "0xDEADBEEF"
+    - "< FOLLOW THE WHITE RABBIT >"
+
+  thinking_faces:
+    - "[?] SEARCHING THE CONSTRUCT..."
+    - "< DEEP SCAN INITIATED >"
+    - "[SYS] ANALYZING SIGNAL"
+    - "0x4E454F00 PATTERN MATCH"
+    - "< HACK THE PLANET >"
+    - "[AI] REASONING CORE ACTIVE"
+    - "< THERE IS NO SPOON >"
+    - "[RED PILL] PROCESSING TRUTH"
+    - "WAKE UP, NEO..."
+    - "< DODGE THIS >"
+
+  thinking_verbs:
+    - "decoding"
+    - "hacking"
+    - "bypassing"
+    - "infiltrating"
+    - "scanning"
+    - "compiling"
+    - "executing"
+    - "jacking in"
+    - "decrypting"
+    - "overriding"
+    - "extracting"
+    - "patching"
+
+  wings:
+    - ["[ ", " ]"]
+    - ["< ", " >"]
+    - ["{ ", " }"]
+    - ["║ ", " ║"]
+    - ["▶ ", " ◀"]
+
+# ── Branding ────────────────────────────────────────────────────────────────
+branding:
+  agent_name: "H3RM3S"
+  welcome: "Wake up, Neo... The Matrix has you. Follow the white rabbit. ◈"
+  goodbye: "You took the blue pill. The story ends. Goodbye. ☎"
+  response_label: " ☩ H3RM3S "
+  prompt_symbol: "▶ "
+  help_header: "[SYS] AVAILABLE COMMANDS — CHOOSE WISELY"
+
+# ── Tool Output ─────────────────────────────────────────────────────────────
+tool_prefix: "│"

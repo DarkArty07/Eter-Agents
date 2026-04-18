@@ -1,0 +1,17 @@
+name: agora
+version: "5.0.0"
+description: "Canal de comunicación inter-agente async vía inbox JSON. Input por tmux, output por archivos persistentes con timestamps. Sin FIFOs, sin threads."
+author: "Eter Team"
+enabled: true
+provides_tools:
+  - talk_to
+provides_hooks:
+  - post_llm_call
+config:
+  timeout_seconds: 300
+  inbox_dir: "~/.hermes/agora/inbox"
+  cards_dir: "agora/plugin/cards"
+  session_name: "agora"
+  startup_timeout: 12
+  max_wait_timeout: 300
+  default_wait_timeout: 120

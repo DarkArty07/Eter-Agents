@@ -1,0 +1,10 @@
+name: hermes
+version: "1.0.0"
+role: orchestrator
+description: "Diseñador de sistemas y orquestador. Recibe objetivos del usuario y delega trabajo a sub-agentes."
+capabilities:
+  - system-design
+  - task-orchestration
+  - agent-delegation
+  - architecture-planning
+available: true

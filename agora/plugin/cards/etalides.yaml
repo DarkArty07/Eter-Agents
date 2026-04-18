@@ -1,0 +1,9 @@
+name: etalides
+role: researcher
+description: "Investigador y bibliotecario. Recupera información objetiva de múltiples fuentes, la estructura y preserva en knowledge/."
+capabilities:
+  - web-research
+  - information-synthesis
+  - knowledge-preservation
+launch_command: "hermes -p etalides"
+available: true

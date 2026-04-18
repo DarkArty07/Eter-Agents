@@ -1,0 +1,214 @@
+# Eter Agent Ecosystem (.hermes) — .gitignore
+# ============================================================
+
+# ============================================================
+# SECRETOS — NUNCA trackear
+# ============================================================
+.env
+.env.*
+auth.json
+auth.lock
+*.key
+*.pem
+*.secret
+
+# ============================================================
+# STATE & DBs (runtime, regenerados)
+# ============================================================
+state.db
+state.db-*
+*.db
+*.db-*
+*.db-journal
+*.db-wal
+*.db-shm
+
+# ============================================================
+# SESSIONS (demasiado pesado, manejado por separado)
+# ============================================================
+sessions/
+sessions.json
+profiles/*/sessions/
+profiles/*/sessions.json
+request_dump_*
+
+# ============================================================
+# MEMORY & LOGS (datos personales, runtime)
+# ============================================================
+memories/
+logs/
+*.log
+interrupt_debug.log
+profiles/*/logs/
+profiles/*/memories/
+
+# ============================================================
+# CHECKPOINTS (git internals del SDK — 7000+ archivos)
+# ============================================================
+checkpoints/
+profiles/*/checkpoints/
+
+# ============================================================
+# SDK (upstream, manejado por separado)
+# ============================================================
+sdk/
+
+# ============================================================
+# CACHE & TEMPORAL
+# ============================================================
+cache/
+image_cache/
+audio_cache/
+models_dev_cache.json
+pairing/
+pastes/
+tmp/
+*.tmp
+*.pyc
+__pycache__/
+profiles/*/__pycache__/
+
+# ============================================================
+# CRON (runtime, cada perfil tiene su propio cron/)
+# ============================================================
+cron/
+profiles/*/cron/
+
+# ============================================================
+# BINARIOS COMPILADOS
+# ============================================================
+bin/
+*.exe
+*.so
+
+# ============================================================
+# SKILLS DEL SDK (grandes, se instalan por perfil)
+# ============================================================
+profiles/*/skills/
+skills/
+
+# ============================================================
+# PLATFORMS (SDK)
+# ============================================================
+platforms/
+
+# ============================================================
+# ARCHIVOS DE CONFIG (por perfil, contienen secretos)
+# ============================================================
+profiles/*/config.yaml
+profiles/*/.env
+
+# ============================================================
+# HISTORIAL & SNAPSHOTS
+# ============================================================
+profiles/*/.hermes_history
+profiles/*/.skills_prompt_snapshot.json
+profiles/*/.update_check
+
+# ============================================================
+# PLUGINS (symlinks a directorios internos)
+# ============================================================
+profiles/*/plugins/
+plugins/
+
+# ============================================================
+# GATEWAY RUNTIME
+# ============================================================
+gateway.pid
+gateway_state.json
+channel_directory.json
+
+# ============================================================
+# WORKSPACES & PROJECTS (runtime dinámico)
+# ============================================================
+projects/
+profiles/*/workspace/
+profiles/*/sandboxes/
+agora/workspace/
+
+# ============================================================
+# AGORA INBOX (runtime, JSON responses)
+# ============================================================
+agora/inbox/
+
+# ============================================================
+# AGORA CONVERSATIONS LOG (runtime, observabilidad)
+# ============================================================
+agora/conversations.log
+
+# ============================================================
+# PROFILE HOME (SDK sandbox)
+# ============================================================
+profiles/*/home/
+
+# ============================================================
+# AGENT CARDS (fuente de verdad: agora/plugin/cards/)
+# ============================================================
+profiles/*/AGENT_CARD.yaml
+
+# ============================================================
+# KNOWLEDGE VAULTS (datos de investigación personal)
+# ============================================================
+profiles/*/knowledge/
+
+# ============================================================
+# OBSIDIAN config (personal)
+# ============================================================
+**/.obsidian/
+
+# ============================================================
+# SECURITY SCANS (resultados de auditoría)
+# ============================================================
+security-scan/
+
+# ============================================================
+# ROOT SOUL.md (SDK default, usamos per-profile)
+# ============================================================
+/SOUL.md
+
+# ============================================================
+# OS
+# ============================================================
+**/.DS_Store
+Thumbs.db
+
+# ============================================================
+# LEGACY & RUNTIME (no van al repo público)
+# ============================================================
+# Planes legacy
+plans/
+
+# Logs de sesiones pasadas
+docs/sesiones/
+
+# Outbox de tareas viejas
+docs/agent-queue/
+
+# Proyecto separado (interface)
+interface/
+
+# Runtime state de agentes
+agora/.eter/
+agora/.ariadna/
+
+# Investigación de desarrollo (no docs de usuario)
+agora/research/
+
+# Runtime state del ecosistema
+.eter/
+
+# Docs runtime de cada perfil
+profiles/*/docs/
+
+# Planes runtime de cada perfil
+profiles/*/plans/
+
+# Runtime de procesos
+profiles/*/processes.json
+
+# Symlinks viejos o runtime en hermes
+profiles/hermes/agora/
+
+# API keys reales (usar env.base.example en su lugar)
+shared/env.base
+security-scan/

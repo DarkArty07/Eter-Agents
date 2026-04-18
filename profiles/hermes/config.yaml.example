@@ -1,0 +1,32 @@
+# ============================================================
+# config.yaml — Agent profile configuration
+# ============================================================
+# Copy this file to config.yaml and adjust for your setup.
+# This file is gitignored — never commit config.yaml!
+# ============================================================
+
+# --- Model Configuration ---
+# The model section defines which LLM to use.
+# Format MUST be nested (not "provider/model" string).
+model:
+  default: qwen3.6-plus          # Model name on the provider
+  provider: opencode-go          # Provider ID
+  base_url: https://opencode.ai/zen/go/v1  # Provider base URL
+  api_mode: chat_completions     # API mode (usually chat_completions)
+
+providers: {}
+fallback_providers: []
+
+# --- Agent Behavior ---
+agent:
+  max_turns: 150                 # Max LLM turns per session
+  reasoning_effort: xhigh        # Reasoning effort level
+
+# --- Toolsets ---
+# Which tool categories this agent can use
+toolsets:
+  - hermes-cli                   # CLI tools (terminal, file, etc.)
+
+# --- Skin (optional) ---
+# Visual theme for the terminal UI. File must be in skins/ directory.
+# skin: skins/matrix.yaml
