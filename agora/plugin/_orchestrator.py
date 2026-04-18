@@ -113,6 +113,9 @@ def register(ctx, timeout_seconds: int = 300):
 
 def _handle_talk_to(args: dict, **kwargs) -> str:
     agent = args.get("agent", "").strip()
+    # Sanitize agent name to prevent path traversal
+    if agent and agent != "?":
+        agent = Path(agent).name
     action = args.get("action", "").strip()
     prompt = args.get("prompt", "")
     session_id = args.get("session_id", "")
@@ -157,6 +160,9 @@ def _handle_talk_to(args: dict, **kwargs) -> str:
 
 
 def _load_card(agent_name: str) -> dict | None:
+    # Defense-in-depth: ensure agent_name is just a filename
+    if agent_name:
+        agent_name = Path(agent_name).name
     card_path = CARDS_DIR / f"{agent_name}.yaml"
     if not card_path.exists():
         return None
